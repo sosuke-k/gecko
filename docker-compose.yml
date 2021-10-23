@@ -16,11 +16,10 @@ services:
     environment:
       GECKO_SERVER_PORT: ${GECKO_SERVER_HOST_PORT}
       GECKO_SERVER_CONTAINER_PORT: ${GECKO_SERVER_CONTAINER_PORT}
+      AWS_ENDPOINT: http://minio:${MINIO_PORT}
       AWS_BUCKET: ${AWS_BUCKET}
-      AWS_REGION: ${AWS_REGION}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_COGNITO_POOL: ${AWS_COGNITO_POOL}
       AWS_FOLDER: ${AWS_FOLDER}
       GECKO_APP_HOST: ${GECKO_APP_HOST}
     networks:
@@ -28,3 +27,33 @@ services:
     ports:
       - ${GECKO_SERVER_HOST_PORT}:${GECKO_SERVER_CONTAINER_PORT}
     command: npm run server
+
+  minio:
+    image: minio/minio:RELEASE.2021-04-22T15-44-28Z.hotfix.8c654a725
+    environment:
+      MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
+      MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
+    networks:
+      - gecko
+    ports:
+      - ${MINIO_PORT}:${MINIO_PORT}
+    volumes:
+      - minio1:/export
+    command: server /export
+
+  geckobucket:
+    image: minio/mc:RELEASE.2021-04-22T17-40-00Z
+    depends_on:
+      - minio
+    networks:
+      - gecko
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add myminio http://minio:${MINIO_PORT} ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY}) do echo 'try to create buckets...' && sleep 1; done;
+      /usr/bin/mc mb myminio/${AWS_BUCKET};
+      /usr/bin/mc policy download myminio/${AWS_BUCKET};
+      exit 0;
+      "
+
+volumes:
+  minio1:

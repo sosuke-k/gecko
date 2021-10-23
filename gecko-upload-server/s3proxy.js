@@ -33,7 +33,15 @@ module.exports = class s3proxy extends EventEmitter {
   }
 
   init(done) {
-    this.s3 = new AWS.S3(Object.assign({ apiVersion: '2006-03-01' }, this.options));
+    const options = {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      endpoint: process.env.AWS_ENDPOINT,
+      s3ForcePathStyle: true, // needed with minio?
+      signatureVersion: 'v4',
+      apiVersion: '2006-03-01'
+    };
+    this.s3 = new AWS.S3(Object.assign(options, this.options));
     this.healthCheck((error, data) => {
       if (error) {
         if (typeof (done) !== typeof (Function)) this.emit('error', error, data);
