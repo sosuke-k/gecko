@@ -58,9 +58,9 @@ export const readMediaFile = async (context, file) => {
 }
 
 const addEmptyFile = (context) => {
-    var filename = context.audioFileName.substr(0, context.audioFileName.lastIndexOf('.')) + ".txt";
-    if (filename === ".txt") {
-        filename = context.audioFileName + ".txt";
+    var filename = context.audioFileName.substr(0, context.audioFileName.lastIndexOf('.')) + ".json";
+    if (filename === ".json") {
+        filename = context.audioFileName + ".json";
     }
     context.filesData.push(
         {
