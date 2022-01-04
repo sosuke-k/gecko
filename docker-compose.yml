@@ -22,6 +22,7 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_FOLDER: ${AWS_FOLDER}
       GECKO_APP_HOST: ${GECKO_APP_HOST}
+      LOG_LEVEL: 'debug'
     networks:
       - gecko
     ports:

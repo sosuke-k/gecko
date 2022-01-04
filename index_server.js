@@ -5,6 +5,11 @@ var cors = require('cors')
 var bodyParser = require("body-parser");
 const path = require('path')
 
+const pino = require('pino');
+const expressPino = require('express-pino-logger');
+const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
+const expressLogger = expressPino({ logger });
+
 const uploadFile = require('./gecko-upload-server/s3')
 const S3Proxy = require('./gecko-upload-server/s3proxy');
 
@@ -13,6 +18,7 @@ proxy.init();
 
 const PORT = process.env.GECKO_SERVER_CONTAINER_PORT;
 
+app.use(expressLogger);
 app.use(express.static('build'))
 app.use(cors())
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
