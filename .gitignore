@@ -1,3 +1,5 @@
+.annotations/
+
 node_modules
 *.pyc
 *.db
